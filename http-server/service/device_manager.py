@@ -3,7 +3,7 @@ import bluetooth
 
 # 2. Device Registration
 ## Step 3
-def scanDeviceList(userId):
+def scanDeviceList():
     discoverList = {}
     nearbyDevices = bluetooth.discover_devices(duration=8, lookup_names=True, flush_cache=True)
     for addr, name in nearbyDevices:

@@ -6,8 +6,8 @@ import json
 ## 2. Device Search Request
 ## ~ 4. Return Connectable Device List
 @app.route("/devices/scan", methods=['GET'])
-def appRequestDeviceList(userId):
-    scanList = device_manager.scanDeviceList(userId)
+def appRequestDeviceList():
+    scanList = device_manager.scanDeviceList()
     session_manager.putInSession("scanList", scanList)
     result = json.dumps(list(scanList.keys()))
     return result
