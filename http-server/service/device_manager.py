@@ -12,11 +12,10 @@ def scanDeviceList():
 
 
 # 2. Device Registration
-## Step 7 ~ 9
+## Step 7
 def connectToDevices(deviceList, scanList):
 
-    ### Step 7
-    def requestDeviceProfiles(deviceList, scanList): # This is not a pure function. don't move this outside.
+    def requestDeviceProfiles(deviceList, scanList): 
         
         deviceProfiles = []
         
@@ -41,7 +40,6 @@ def connectToDevices(deviceList, scanList):
             
         return deviceProfiles            
 
-    ### Step 7.1.
     def getDeviceProfile(sock):
         sock.send("{ \"command\" : \"getProfile\"")
         while True:
@@ -53,18 +51,23 @@ def connectToDevices(deviceList, scanList):
             except Exception:
                 sock.close()
                 return None
-        
-    deviceProfiles = requestDeviceProfiles()
-    isAuthenticated = platform_manager.updateDeviceProfiles(deviceProfiles)
     
-    # Debug
-    if not isAuthenticated["authenticated"]:
-        print(device + " can't update profile")
-        
-    return isAuthenticated
+    if(scanList == None or scanList.empty()):
+        deviceProfiles = []
+    else:
+        deviceProfiles = requestDeviceProfiles(deviceList, scanList)
+
+    return deviceProfiles
+
+
+## Step 9
+def updateDevices(profiles):
+    response = platform_manager.updateDeviceProfiles(profiles)
+    return response
+    
 
 # 4. Access Control
 ## Step 2 ~ 4
-def accessToDevice(action, params):
+def accessToDevice(deviceAddr, actionName, params):
     pass
 

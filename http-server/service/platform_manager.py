@@ -4,6 +4,7 @@ import json
 # 2. Device Registration
 ## Step 9
 def updateDeviceProfiles(deviceProfiles):
+    pepId = "pep_1" # TODO:Load from profile file.
     data = deviceProfiles
     response = requester.sendRequest(pepId, data, "POST");
     result = response.json()

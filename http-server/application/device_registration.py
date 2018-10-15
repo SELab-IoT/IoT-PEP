@@ -1,6 +1,7 @@
 from application import app
 from service import device_manager
 from util import session_manager
+from flask import request
 import json
 
 ## 2. Device Search Request
@@ -21,11 +22,13 @@ def requestForConnectToDevices():
     def parseRequest():
         content = request.get_json()
         jsonConnectList = content.get("deviceList")
-        connectList = json.loads(jsonConnectList)
+        print(type(jsonConnectList))
+        connectList = json.dumps(jsonConnectList)
         return connectList
     
     connectList = parseRequest()
     scanList = session_manager.get("scanList")
     
-    result = device_manager.connectToDevices(connectList, scanList) # ack or nack
-    return result
+    deviceProfiles = device_manager.connectToDevices(connectList, scanList)
+    result = device_manager.updateDevices(deviceProfiles)
+    return json.dumps(result)

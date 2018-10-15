@@ -7,8 +7,8 @@ from flask import request
 # 4. Access Control(XACML Request)
 ## 1. Device Access Request
 ## ~ 4. Return Permit or Deny
-@app.route("/devices/<deviceId>", methods=['POST'])
-def requestForAccessToDevice(deviceId):
+@app.route("/devices/<deviceName>", methods=['POST'])
+def requestForAccessToDevice(deviceName):
     
     def parseRequest():
         content = request.get_json()
@@ -23,12 +23,14 @@ def requestForAccessToDevice(deviceId):
     
     actionId, actionName, params = parseRequest()
     
-    bundle = {"pepId":pepId, "body":{"userId":userId, "deviceId":deviceId, "actionId":actionId, "actionName":actionName, "params":params}}
+    bundle = {"pepId":pepId, "body":{"userId":userId, "deviceName":deviceName, "actionId":actionId, "actionName":actionName, "params":params}}
     payload = xacml_request_builder.buildRequest(bundle)
     result = platform_manager.queryToPDP(payload)
     
     if(result["decision"]):
         values = list(map(lambda p: p["value"], params))
-        device_manager.accessToDevice(action, values)
+        scanList = session_manager.get("scanList")
+        deviceAddr = scanList[deviceName]
+        device_manager.accessToDevice(deviceAddr, actionName, values)
     
-    return json.dumps(result)
+    return json.dump(result)
