@@ -11,26 +11,38 @@ from flask import request
 def requestForAccessToDevice(deviceName):
     
     def parseRequest():
-        content = request.get_json()
+        content = json.loads(request.get_data())
         actionId = content.get("actionId")
         actionName = content.get("actionName")
         params = content.get("params")
-        return (actionId, actionName, params)
+        deviceId = content.get("deviceId")
+        #print(actionId, actionName, params, deviceId)
+        
+        userId = content.get("userId")
+        sessionKey = content.get("sessionKey")
+        loggedIn = session_manager.checkLogin(userId, sessionKey)
+        
+        return (actionId, actionName, params,deviceId, loggedIn)
     
-    pepId = "pep_1" # TODO: remove hardcode -> replace it read profile file.
-    userId = session_manager.get("userId")
-    userId = "frebern" # Debug
+    # TODO: remove hardcode -> replace it read profile file.
+    pepId = "pep_1" 
     
-    actionId, actionName, params = parseRequest()
+    actionId, actionName, params, deviceId, loggedIn = parseRequest()
     
-    bundle = {"pepId":pepId, "body":{"userId":userId, "deviceName":deviceName, "actionId":actionId, "actionName":actionName, "params":params}}
-    payload = xacml_request_builder.buildRequest(bundle)
-    result = platform_manager.queryToPDP(payload)
+    if(loggedIn):
     
-    if(result["decision"]):
-        values = list(map(lambda p: p["value"], params))
-        scanList = session_manager.get("scanList")
-        deviceAddr = scanList[deviceName]
-        device_manager.accessToDevice(deviceAddr, actionName, values)
+        bundle = {"pepId":pepId, "body":{"userId":userId, "deviceName":deviceName, "actionId":actionId, "actionName":actionName, "params":params,"deviceId":deviceId}}
+        payload = xacml_request_builder.buildRequest(bundle)
+        result = platform_manager.queryToPDP(payload)
+        
+        #mock up the value of result for testing
+        result["decision"]=True
+        
+        if(result["decision"]):
+            values = list(map(lambda p: p["value"], params))
+            device_manager.accessToDevice(deviceName, actionName, values)
+            
+    else:
+        result = "{}"
     
-    return json.dump(result)
+    return json.dumps(result)

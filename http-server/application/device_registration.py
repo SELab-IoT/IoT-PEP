@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 from application import app
 from service import device_manager
 from util import session_manager
@@ -9,7 +11,6 @@ import json
 @app.route("/devices/scan", methods=['GET'])
 def appRequestDeviceList():
     scanList = device_manager.scanDeviceList()
-    session_manager.putInSession("scanList", scanList)
     result = json.dumps(list(scanList.keys()))
     return result
 
@@ -20,15 +21,37 @@ def appRequestDeviceList():
 def requestForConnectToDevices():
     
     def parseRequest():
-        content = request.get_json()
-        jsonConnectList = content.get("deviceList")
-        print(type(jsonConnectList))
-        connectList = json.dumps(jsonConnectList)
-        return connectList
+        ##########################
+        content = json.loads(request.get_data(), encoding="utf-8")
+        connectList = content.get("deviceList")
+        
+        userId = content.get("userId")
+        sessionKey = content.get("sessionKey")
+        loggedIn = session_manager.checkLogin(userId, sessionKey)
+        
+        return (connectList, loggedIn)
     
-    connectList = parseRequest()
-    scanList = session_manager.get("scanList")
+    connectList, loggedIn = parseRequest()
     
-    deviceProfiles = device_manager.connectToDevices(connectList, scanList)
-    result = device_manager.updateDevices(deviceProfiles)
+    if(loggedIn):
+        scanList = session_manager.scanList
+        
+        print("connectList : ")
+        print(connectList)
+        
+        print("scanList : ")
+        print(scanList)
+        
+        deviceProfiles = device_manager.connectToDevices(connectList, scanList)
+        
+        print("deviceProfiles : ")
+        print(deviceProfiles)
+        
+        result = device_manager.updateDevices(deviceProfiles)
+    
+    else:
+        result = "{}"
+    
+    print("result : "+ json.dumps(result))
+    
     return json.dumps(result)
