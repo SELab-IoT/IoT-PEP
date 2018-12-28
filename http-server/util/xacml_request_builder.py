@@ -1,8 +1,9 @@
+#-*- coding: utf-8 -*-
 import json
 
 def buildRequest(bundle):
     
-    prefix_type = "http://www.w3.org/2001/XMLSchema#"
+    prefix_type = "http://www.w3.org/2001/XMLSchema#" 
     
     pepId = bundle["pepId"]
     body = bundle["body"]

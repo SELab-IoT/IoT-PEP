@@ -1,12 +1,15 @@
+#-*- coding: utf-8 -*-
+
 from util import requester
 import json
+from util import profile_manager
     
 # 2. Device Registration
 ## Step 9
 def updateDeviceProfiles(deviceProfiles):
-    pepId = "pep_1" # TODO:Load from profile file.
+    pepId = profile_manager.getPEPId()
     data = deviceProfiles
-    response = requester.sendRequest(pepId, data, "POST");
+    response = requester.sendRequest("devices/"+pepId, data, "POST");
     result = response.json()
     return result
 
