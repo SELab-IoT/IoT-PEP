@@ -2,6 +2,7 @@
 
 import requests
 import json
+import yaml
 
 # Send Request to PlatformManager
 PLATFORM_MANAGER = "http://selab.hanyang.ac.kr:8080/"
@@ -35,4 +36,5 @@ def sendGetRequest(url, content):
 
 # send post request to PM
 def sendPostRequest(url, content):
-    return requests.post(url, data=json.dumps(content))
+    headers = {'content-type': 'application/json'}
+    return requests.post(url, headers=headers, data=json.dumps(content))

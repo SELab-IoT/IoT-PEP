@@ -57,6 +57,7 @@ def connectToDevices(deviceList, scanList):
 
 def getDeviceProfile(deviceName,sock):
     sock.send("{ \"command\" : \"getProfile\"}")
+    # When Device have no profile, sock.recv(1024) not finishing...
     receiveData = sock.recv(1024)
     print("Debug in device_manager.py:46  : Received Data from Device")
     print(receiveData)
@@ -89,11 +90,12 @@ def connectToDevice(deviceName, scanList):
         name = firstMatch["name"]
         host = firstMatch["host"]
     #using device name and mac to find service    
-    print("Connecting to device... : %s (host: %s)" % (name, host))
+    print("Connecting to device... : %s (host: %s) " % (name, host))
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     sock.connect((host, port))
-    print("Connected!")  
+    print("Connected!")
     profile = getDeviceProfile(deviceName, sock)
+    
     return yaml.safe_load(profile)
 
 
@@ -123,7 +125,7 @@ def accessToDevice(deviceName, macAddress, actionName, params):
     #print("Connecting to device... : %s (host: %s)" % (name, host))
         sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         sock.connect((host, port))
-        print("Connected!")
+        print("Connected! ")
     
     #send the instruction
     print(eval(json.dumps(params)))

@@ -49,7 +49,7 @@ def isExpired(timestamp):
 def queryToPlatformManager(userId, sessionKey):
     content = {}
     content["userId"] = userId
-    content["sessionkey"] = sessionKey
-    result = requester.sendRequest("session", payload, "POST")
+    content["sessionKey"] = sessionKey
+    result = requester.sendRequest("session", content, "POST").json()
     return result["authenticated"]
     
