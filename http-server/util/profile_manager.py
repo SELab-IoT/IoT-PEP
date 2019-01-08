@@ -9,12 +9,11 @@ profile = {}
 def loadProfile(base = "resources/profile/", file = "pep.profile"):
     global profile
     fo = open(base+file,"r")
-    stringProfile = fo.read() #read all information
+    stringProfile = fo.read()
     tmp = json.loads(stringProfile)
     tmp = json.dumps(tmp)
     tmp = yaml.safe_load(tmp)
-    profile = tmp["profile"] #split the pep profile as dict type
-    print(profile)
+    profile = tmp["profile"]
     fo.close()
     
 

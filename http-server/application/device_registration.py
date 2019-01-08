@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-
 from application import app
 from service import device_manager
 from util import session_manager
@@ -12,8 +11,6 @@ import yaml
 @app.route("/devices/scan", methods=['GET'])
 def appRequestDeviceList():
     scanList = device_manager.scanDeviceList()
-    print("scanList : ")
-    print(device_manager.scanList)
     result = json.dumps(list(scanList.keys()))
     return result
 
@@ -24,18 +21,11 @@ def appRequestDeviceList():
 def requestForConnectToDevices():
     
     def parseRequest():
-        ##########################
         content = yaml.safe_load(request.get_data())
         connectList = content.get("deviceList")
-##        connectList = map(lambda x:x.encode('ascii'), connectList)
-        print("Debug in device_registration.py:30")
-        print(content)
-        print(connectList)
-        print(type(connectList))
         userId = content.get("userId")
         sessionKey = content.get("sessionKey")
         loggedIn = session_manager.checkLogin(userId, sessionKey)
-        
         return (connectList, loggedIn)
     
     connectList, loggedIn = parseRequest()
@@ -43,13 +33,10 @@ def requestForConnectToDevices():
     if(loggedIn):
         scanList = device_manager.scanList
         deviceProfiles = device_manager.connectToDevices(connectList, scanList)
-        print("Debug in device_registration.py : 46")
-        print(deviceProfiles)
         result = device_manager.updateDevices(deviceProfiles)
     
     else:
-        result = "{}"
-    
-    print("result : "+ json.dumps(result))
+        result = {}
     
     return json.dumps(result)
+

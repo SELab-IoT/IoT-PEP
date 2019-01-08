@@ -10,15 +10,14 @@ def updateDeviceProfiles(deviceProfiles):
     pepId = profile_manager.getPEPId()
     data = deviceProfiles
     response = requester.sendRequest("devices/"+pepId, data, "POST");
-    result = response.json()
-    return result
+    return response.json()
 
 
 # 4. Access Control
 ## Step 2
 def queryToPDP(payload):
-    response = requester.sendRequest("evaluate/", payload, "POST")
-    raw = response.text
+
+    raw = response.textrequester.sendRequest("evaluate/", payload, "POST").text
     
     def parseResponse():
         result = {}
@@ -30,6 +29,6 @@ def queryToPDP(payload):
             result["advices"].append(raw[raw.find("<Advices>"):raw.find("</Advices>")])
         return result
     
-    result = parseResponse()
-    return result
+    return parseResponse()
+
 

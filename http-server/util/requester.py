@@ -13,7 +13,6 @@ def sendRequest(subURL, content, method="GET"):
     URL = PLATFORM_MANAGER + subURL
     
     print("-------------------------------------------------")
-    print("Debug in requester.py : 12")
     print("* URL : "+URL + " ("+method+")")
     print("*** Content ***")
     print(content)

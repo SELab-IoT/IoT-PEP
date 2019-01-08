@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-
 from datetime import datetime, date, time, timedelta
 from util import requester
 from application import app
@@ -23,9 +22,7 @@ def login(userId, sessionKey):
     
 # Session Check
 def checkSessionKeyValidity(userId, sessionKey):
-    result = queryToPlatformManager(userId, sessionKey)
-##    result = True #for test
-    return result
+    return queryToPlatformManager(userId, sessionKey)
     
 def logout(userId, sessionKey):
     global userList
@@ -52,4 +49,4 @@ def queryToPlatformManager(userId, sessionKey):
     content["sessionKey"] = sessionKey
     result = requester.sendRequest("session", content, "POST").json()
     return result["authenticated"]
-    
+

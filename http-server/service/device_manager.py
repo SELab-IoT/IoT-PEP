@@ -13,12 +13,10 @@ scanList = {}
 def scanDeviceList():
     global scanList
     discoverList = {}
-    nearbyDevices = bluetooth.discover_devices(duration=6, lookup_names=True, flush_cache=True)
+    nearbyDevices = bluetooth.discover_devices(duration=5, lookup_names=True, flush_cache=True)
     for addr, name in nearbyDevices:
         discoverList[name] = addr
     scanList = discoverList
-    print("Debug in device_manager.py:20")
-    print(scanList)
     return discoverList
 
 
@@ -29,10 +27,9 @@ def connectToDevices(deviceList, scanList):
     def requestDeviceProfiles(deviceList, scanList): 
         deviceProfiles = []
         for deviceName in deviceList:
-            print("Debug in device_manager.py:29")
-            print(scanList)
-            deviceProfile = connectToDevice(deviceName, scanList) #parameters missed ->scanList
+            deviceProfile = connectToDevice(deviceName, scanList) 
             
+            # TODO: Maybe Dead Code. remove later
             # Action Params to String - PlatformManager handle params to String only...
 ##            tmp = deviceProfile["actions"]
 ##            actions = []
@@ -43,17 +40,15 @@ def connectToDevices(deviceList, scanList):
             
             deviceProfiles.append(deviceProfile)
             
-        return deviceProfiles            
-    ####### change -> scanList.empty()
+        return deviceProfiles
+    
     if(scanList == None or len(scanList)==0):
         deviceProfiles = []
     else:
         deviceProfiles = requestDeviceProfiles(deviceList, scanList)
 
-    print("Debug in device_manager.py:41")
-    print(deviceProfiles)
-
     return deviceProfiles
+
 
 def getDeviceProfile(deviceName,sock):
     sock.send("{ \"command\" : \"getProfile\"}")
@@ -63,37 +58,20 @@ def getDeviceProfile(deviceName,sock):
     print(receiveData)
     sock.close()
     return receiveData
-#    while True:
-#        try:
-#            receiveData = sock.recv(1024)
-#            pinrt(receiveData)
-#            if(receiveData != None):
-#                #sock.close()
-#                return receiveData
-#        except Exception:
-#            sock.close()
-#            return None
 
-def connectToDevice(deviceName, scanList):
-    
-    #print(deviceName)
+
+def connectToDevice(deviceName, scanList):    
     addr = scanList[deviceName]
-    print("Connect To: "+addr)
     if addr != None:
         serviceMatches = bluetooth.find_service(name=deviceName, address=addr)
         if len(serviceMatches) == 0:
-            #continue is not suitable
-            #continue
-            return
+            return {}
         firstMatch = serviceMatches[0]
         port = firstMatch["port"]
         name = firstMatch["name"]
         host = firstMatch["host"]
-    #using device name and mac to find service    
-    print("Connecting to device... : %s (host: %s) " % (name, host))
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     sock.connect((host, port))
-    print("Connected!")
     profile = getDeviceProfile(deviceName, sock)
     
     return yaml.safe_load(profile)
@@ -101,17 +79,12 @@ def connectToDevice(deviceName, scanList):
 
 ## Step 9
 def updateDevices(profiles):
-    response = platform_manager.updateDeviceProfiles(profiles)
-    return response
+    return platform_manager.updateDeviceProfiles(profiles)
     
 
 # 4. Access Control
 ## Step 2 ~ 4
 def accessToDevice(deviceName, macAddress, actionName, params):
-    
-    ## It's mockup code
-    #deviceAddr = "B8:27:EB:7C:5A:B1"
-    #deviceName = "aircon"
     
     # connect to device agian
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -121,17 +94,16 @@ def accessToDevice(deviceName, macAddress, actionName, params):
         port = firstMatch["port"]
         name = firstMatch["name"]
         host = firstMatch["host"]
-    #using device name and mac to find service    
-    #print("Connecting to device... : %s (host: %s)" % (name, host))
+        
+        #using device name and mac to find service
         sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         sock.connect((host, port))
-        print("Connected! ")
-    
-    #send the instruction
+        
+    #Send the Action Command
     print(eval(json.dumps(params)))
     instruction = {"actionName":actionName, "params":params}
-    sock.send(json.dumps(instruction) )
-    #time.sleep(1)
+    sock.send(json.dumps(instruction))
+    
     response = sock.recv(1024)
     time.sleep(2)
     sock.close()
