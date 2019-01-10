@@ -17,7 +17,7 @@ def updateDeviceProfiles(deviceProfiles):
 ## Step 2
 def queryToPDP(payload):
 
-    raw = response.textrequester.sendRequest("evaluate/", payload, "POST").text
+    raw = requester.sendRequest("evaluate/", payload, "POST").text
     
     def parseResponse():
         result = {}

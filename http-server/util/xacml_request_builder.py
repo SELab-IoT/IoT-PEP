@@ -3,7 +3,11 @@ import json
 
 def buildRequest(bundle):
     
-    stringType = toXACMLType("string")
+    def join(tup):
+        prefix, type = tup
+        return prefix+type
+    
+    stringType = join(toXACMLType("string"))
     
     pepId = bundle["pepId"]
     body = bundle["body"]
@@ -111,22 +115,23 @@ def toXACMLType(raw):
     }
     
     #Traverse mapper to convert raw type to XACML type.
-    for prefix, types in mapper:
+    for prefix, types in mapper.items():
         if(raw in types.keys()):
             return (prefix, raw)
-        for xacmlType, rawTypes in types:
+        for xacmlType, rawTypes in types.items():
             if(raw in rawTypes):
                 return (prefix, xacmlType)
             
     return ("", raw)
     
     
-def toXACMLLiteral(type, raw):
+def toXACMLLiteral(raw, type):
+    
     #Mapper for raw literal to XACML literal
     mapper = {
         "boolean":{
-            "True" : ["true", "TRUE"],
-            "False" : ["false", "FALSE"]
+            "true" : ["True", "TRUE"],
+            "false" : ["False", "FALSE"]
         }
     }
     
@@ -135,7 +140,7 @@ def toXACMLLiteral(type, raw):
         return raw
     
     #Traverse mapper to convert raw value literal to XACML literal
-    for xacml, raws in mapper[type]:
+    for xacml, raws in mapper[type].items():
         if(raw in raws):
             return xacml
     

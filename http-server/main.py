@@ -14,5 +14,5 @@ pep_profile = profile_manager.getProfileAsDict()
 host_ip, host_port = pep_profile["pepIp"].split(":")
 
 print("PEP Server Starting...\n")
-app.run(host=host_ip, port=int(host_port), debug=False)
+app.run(host=host_ip, port=int(host_port), debug=True)
 

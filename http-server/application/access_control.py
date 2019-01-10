@@ -25,21 +25,21 @@ def requestForAccessToDevice(deviceId):
         return (userId, sessionKey, actionId, actionName, params, deviceName, macAddress)
     
     pepId =  profile_manager.getPEPId()
-    
     userId, sessionKey, actionId, actionName, params, deviceName, macAddress = parseRequest()
-
-    loggedIn = session_manager.checkLogin(userId, sessionKey)    
-    if(loggedIn):    
+    loggedIn = session_manager.checkLogin(userId, sessionKey)
+    
+    if(loggedIn):
         bundle = {"pepId":pepId, "body":{"userId":userId, "deviceName":deviceName, "actionId":actionId, "actionName":actionName, "params":params,"deviceId":deviceId}}
         payload = xacml_request_builder.buildRequest(bundle)
         result = platform_manager.queryToPDP(payload)
-        
         if(result["decision"]):
             values = list(map(lambda p: p["value"], params))
             # Is device running successfully?
             receive = device_manager.accessToDevice(deviceName, macAddress, actionName, values)
             receive = yaml.safe_load(receive)["result"] == "Success"
-            result["success"]=receive         
+            result["success"]=receive
+        else:
+            result["success"]=False
     else:
         result = {}
     
